@@ -16,7 +16,7 @@ public:
 	void draw();
 
 private:
-	int lotWidth, lotDepth;//Buildings locked to lots, or more precise sizes
+	int lotWidth, lotDepth;
 	int height;
 };
 

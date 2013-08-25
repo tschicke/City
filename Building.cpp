@@ -8,11 +8,10 @@
 #include "Building.h"
 
 Building::Building() {
-	// TODO Auto-generated constructor stub
-
 }
 
 Building::~Building() {
-	// TODO Auto-generated destructor stub
 }
 
+void Building::draw() {
+}

@@ -11,6 +11,8 @@
 
 #include <gl/glew.h>
 
+#include "Block.h"
+
 MainWindow::MainWindow() {
 	running = false;
 }
@@ -21,12 +23,16 @@ MainWindow::~MainWindow() {
 void MainWindow::create(int width, int height, const char* title) {
 	create(sf::VideoMode(width, height, 32), title);
 
+	setFramerateLimit(60);
+
 	initGL();
 }
 
 void MainWindow::run() {
 	int frames = 0;
 	long fpsCounter = 0;
+
+	Block block;
 
 	sf::Clock clock;
 	while(running){
