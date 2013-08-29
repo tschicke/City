@@ -48,9 +48,24 @@ Block::Block() {
 
 	MathHelper::reverseBubbleSort(buildingSizes, numBuildings);
 
-	for(int i = 0; i < numBuildings; ++i){
-
+	for(int i = 0; i < numLots; ++i){
+		lotArray[i] = -1;
 	}
+
+	for(int i = 0; i < numBuildings; ++i){
+		int buildingSize = buildingSizes[i];
+		for (int buildingLot = 0; buildingLot < buildingSize; ++buildingLot){
+			int lotX = -1, lotY = -1;
+			int priority = 0;
+			for(int x = 0; x < blockWidth; ++x){
+				for(int z = 0; z < blockDepth; ++z){
+
+				}
+			}
+		}
+	}
+
+	//Printing
 
 	std::cout << numBuildings << '\n';
 
@@ -75,4 +90,8 @@ void Block::draw() {
 	for (int i = 0; i < numBuildings; ++i) {
 		buildingArray[i].draw();
 	}
+}
+
+int Block::lotIndex(int x, int y) {
+	return x * blockDepth + y;
 }
