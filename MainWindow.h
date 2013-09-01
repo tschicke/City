@@ -12,6 +12,8 @@
 
 #include "Common.h"
 
+#include "Block.h"
+
 class MainWindow : public sf::Window {
 public:
 	MainWindow();
@@ -24,6 +26,8 @@ public:
 private:
 	using sf::Window::create;
 
+	int width, height;
+
 	void run();
 	bool running;
 
@@ -34,6 +38,9 @@ private:
 	void render();
 
 	void cleanup();
+
+	//TEMP
+	Block block;
 };
 
 #endif /* MAINWINDOW_H_ */

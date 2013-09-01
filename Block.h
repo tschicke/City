@@ -18,15 +18,15 @@ public:
 
 		ONE_EDGE_NO_DIAG_SIDE,
 
-		ONE_EDGE_ONE_DIAG_SIDE,
-
 		ONE_EDGE_NO_DIAG_CORNER,
+
+		ONE_EDGE_NO_DIAG_CENTER,
+
+		ONE_EDGE_ONE_DIAG_SIDE,
 
 		ONE_EDGE_ONE_DIAG_CORNER,
 
 		ONE_EDGE_ONE_DIAG_CENTER,
-
-		ONE_EDGE_NO_DIAG_CENTER,
 
 		TWO_EDGE_ONE_DIAG_SIDE,
 
@@ -46,7 +46,13 @@ public:
 
 	void draw();
 
-	static const int blockWidth = 3, blockDepth = 3;
+	int * getLotArray();
+	int getNumBuildings();
+
+	static const int blockWidth = 6, blockDepth = 6;
+	static const int lotScale = 100;
+
+	friend class Building;
 private:
 	int numBuildings;
 	Building * buildingArray;

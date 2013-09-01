@@ -29,7 +29,7 @@ private:
 	double interpolate(double a, double b, double x);
 
 	int seed;
-	int counter;
+	unsigned int counter;
 };
 
 #endif /* NOISE_H_ */

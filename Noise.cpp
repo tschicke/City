@@ -12,7 +12,7 @@
 
 Noise::Noise() {
 	counter = 0;
-	seed = 0;
+	seed = 3;
 }
 
 Noise::Noise(int seed) {
@@ -63,28 +63,21 @@ double Noise::smoothNoise3D(double x, double y, double z) { //TODO make noise fu
 	return interpolate(int5, int6, z - floorz);
 }
 
-double Noise::noise1D(int x) {
-	int n = x * seed;
-	n = (n << 13) ^ n;
-	int nn = (n * (n * n * 60493 + 19990303) + 1376312589) & 0x7fffffff;
-	return 1.0 - ((double) nn / 1073741824.0);
-}
-
 double Noise::nextDouble() {
 	counter += seed;
-	counter %= 2147483648;
+	counter %= 2147483647;
 	return noise1D(counter);
 }
 
 float Noise::nextFloat() {
 	counter += seed;
-	counter %= 2147483648;
+	counter %= 2147483647;
 	return (float)noise1D(counter);//TODO make float version of noise1D()
 }
 
 int Noise::nextInt() {
 	counter += seed;
-	counter %= 2147483648;
+	counter %= 2147483647;
 	return (int) (noise1D(counter) * MAX_NOISE_RAND);
 }
 
@@ -92,6 +85,13 @@ double Noise::interpolate(double a, double b, double x) {
 	double ft = x * 3.1415927;
 	double f = (1.0 - cos(ft)) * 0.5;
 	return a * (1.0 - f) + b * f;
+}
+
+double Noise::noise1D(int x) {
+	int n = x * seed;
+	n = (n << 13) ^ n;
+	int nn = (n * (n * n * 60493 + 19990303) + 1376312589) & 0x7fffffff;
+	return 1.0 - ((double) nn / 1073741824.0);
 }
 
 double Noise::noise2D(int x, int y) {
