@@ -12,7 +12,9 @@
 
 #include "Common.h"
 
+//Temp
 #include "Block.h"
+#include "Renderer.h"
 
 class MainWindow : public sf::Window {
 public:
@@ -40,7 +42,8 @@ private:
 	void cleanup();
 
 	//TEMP
-	Block block;
+//	Block block;
+	Renderer renderer;
 };
 
 #endif /* MAINWINDOW_H_ */

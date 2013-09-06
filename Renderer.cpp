@@ -9,6 +9,8 @@
 
 #include "Common.h"
 
+#include <iostream>
+
 #include <gl/glew.h>
 
 #include <glm/gtx/transform.hpp>
@@ -21,23 +23,23 @@ void Renderer::setProjectionMatrix(int fov, int width, int height, int renderDis
 	Renderer::width = width;
 	Renderer::height = height;
 	Renderer::renderDistance = renderDistance;
-	projectionMatrix = glm::perspective((float)fov, (float)width / (float) height, 0.5f, (float)renderDistance);
+	projectionMatrix = glm::perspective((float)fov, (float)width / (float) height, 0.1f, (float)renderDistance);
 }
 
 void Renderer::setFov(int fov) {
 	Renderer::fov = fov;
-	projectionMatrix = glm::perspective((float)fov, (float)width / (float) height, 0.5f, (float)renderDistance);
+	projectionMatrix = glm::perspective((float)fov, (float)width / (float) height, 0.1f, (float)renderDistance);
 }
 
 void Renderer::setProjectionSize(int width, int height) {
 	Renderer::width = width;
 	Renderer::height = height;
-	projectionMatrix = glm::perspective((float)fov, (float)width / (float) height, 0.5f, (float)renderDistance);
+	projectionMatrix = glm::perspective((float)fov, (float)width / (float) height, 0.1f, (float)renderDistance);
 }
 
 void Renderer::setRenderDistance(int renderDistance) {
 	Renderer::renderDistance = renderDistance;
-	projectionMatrix = glm::perspective((float)fov, (float)width / (float) height, 0.5f, (float)renderDistance);
+	projectionMatrix = glm::perspective((float)fov, (float)width / (float) height, 0.1f, (float)renderDistance);
 }
 
 Renderer::Renderer() {
@@ -59,14 +61,13 @@ void Renderer::allocBuffers(int vertexBufferSize, int indexBufferSize) {
 	}
 
 	glGenBuffers(1, &vertexBufferID);
-	glGenBuffers(1, &indexBufferID);
-
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-	glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	glGenBuffers(1, &indexBufferID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBufferSize, NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBufferSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	buffersAllocated = true;
@@ -88,6 +89,7 @@ void Renderer::subVertexData(int offset, int size, int* data) {
 	if (!buffersAllocated) {
 		return;
 	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -97,6 +99,7 @@ void Renderer::subVertexData(int offset, int size, float* data) {
 	if (!buffersAllocated) {
 		return;
 	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -106,12 +109,16 @@ void Renderer::subIndexData(int offset, int size, unsigned int* data) {
 	if (!buffersAllocated) {
 		return;
 	}
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void Renderer::initShaders(const char* vertexShaderPath, const char* fragmentShaderPath) {
+	if(shadersInitialized){
+		return;
+	}
 	Shader vertexShader;
 	vertexShader.loadShader(vertexShaderPath, GL_VERTEX_SHADER);
 
@@ -125,9 +132,20 @@ void Renderer::initShaders(const char* vertexShaderPath, const char* fragmentSha
 
 	vertexShader.deleteShader();
 	fragmentShader.deleteShader();
+
+	shadersInitialized = true;
+}
+
+void Renderer::setNumVertices(int numVertices, int numVerticesToDraw) {
+	this->numVertices = numVertices;
+	this->numVerticesToDraw = numVerticesToDraw;
 }
 
 void Renderer::render(glm::mat4* viewMatrix) {
+	if(!(buffersAllocated && shadersInitialized)){
+		return;
+	}
+
 	shaderProgram.useProgram();
 
 	shaderProgram.setUniform("modelMatrix", &modelMatrix, 1);
@@ -143,7 +161,7 @@ void Renderer::render(glm::mat4* viewMatrix) {
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *) 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void *) (sizeof(float) * numVertices * 3));
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void *) (sizeof(float) * numVertices * 3));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void *) (sizeof(float) * numVertices * 3 * 2));
 
 	glDrawElements(GL_TRIANGLES, numVerticesToDraw, GL_UNSIGNED_INT, (void *) 0);
 

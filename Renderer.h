@@ -32,6 +32,8 @@ public:
 
 	void initShaders(const char * vertexShaderPath, const char * fragmentShaderPath);
 
+	void setNumVertices(int numVertices, int numVerticesToDraw);
+
 	void render(glm::mat4 * viewMatrix);
 
 	//Transformation Functions
@@ -59,7 +61,6 @@ private:
 	glm::mat4 modelMatrix;
 
 	int numVertices, numVerticesToDraw;
-
 };
 
 #endif /* RENDERER_H_ */

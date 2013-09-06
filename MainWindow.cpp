@@ -11,7 +11,8 @@
 
 #include <gl/glew.h>
 
-#include "Block.h"
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 
 MainWindow::MainWindow() {
 	width = height = 0;
@@ -29,6 +30,8 @@ void MainWindow::create(int width, int height, const char* title) {
 	setFramerateLimit(60);
 
 	initGL();
+
+	Renderer::setProjectionMatrix(90, width, height, 100);
 }
 
 void MainWindow::run() {
@@ -78,6 +81,44 @@ void MainWindow::initGL() {
 //	glClearColor(0, 0, 0, 1);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+//	float vertices[] = {
+//			0, 0, 0,
+//			1, 0, 0,
+//			1, 1, 0,
+//			0, 1, 0
+//	};
+//
+//	float colors[] = {
+//			1, 1, 0,
+//			0, 1, 1,
+//			1, 0, 1,
+//			0, 1, 0
+//	};
+//
+//	float normals[] = {
+//			0, 0, 1,
+//			0, 0, 1,
+//			0, 0, 1,
+//			0, 0, 1
+//	};
+//
+//	unsigned int indices[] = {
+//			0, 1, 2,
+//			0, 2, 3
+//	};
+//
+//	renderer.initShaders("shaders/colorShader.vert", "shaders/colorShader.frag");
+//
+//	renderer.allocBuffers(sizeof(vertices) + sizeof(colors) + sizeof(normals), sizeof(indices));
+//
+//	renderer.subVertexData(0, sizeof(vertices), vertices);
+//	renderer.subVertexData(sizeof(vertices), sizeof(colors), colors);
+//	renderer.subVertexData(sizeof(vertices) + sizeof(colors), sizeof(normals), normals);
+//	renderer.subIndexData(0, sizeof(indices), indices);
+//
+//	renderer.setNumVertices(4, 6);
 }
 
 void MainWindow::handleInput() {
@@ -100,24 +141,9 @@ void MainWindow::update(time_t dt) {
 void MainWindow::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, width, 0, height, -1, 1);
-
-	block.draw();
-
-//	glBegin(GL_TRIANGLES);
-//	glColor3f(0, 0, 0);
-//	glVertex2f(0, 0);
-//	glVertex2f(400, 0);
-//	glVertex2f(400, 800);
-//
-//	glVertex2f(0, 0);
-//	glVertex2f(400, 800);
-//	glVertex2f(0, 800);
-//	glEnd();
+	glm::mat4 viewMatrix = glm::lookAt(glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	renderer.render(&viewMatrix);
+//	block.draw();
 
 	display();
 }
