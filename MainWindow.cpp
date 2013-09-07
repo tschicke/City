@@ -14,6 +14,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include "MathHelper.h"
+
 MainWindow::MainWindow() {
 	width = height = 0;
 	running = false;
@@ -30,6 +32,9 @@ void MainWindow::create(int width, int height, const char* title) {
 	setFramerateLimit(60);
 
 	initGL();
+	MathHelper::init();
+
+	camera.init(glm::vec3(0, 0, -1));
 
 	Renderer::setProjectionMatrix(90, width, height, 100);
 }
@@ -81,48 +86,51 @@ void MainWindow::initGL() {
 //	glClearColor(0, 0, 0, 1);
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+//	glEnable(GL_CULL_FACE);
 
-//	float vertices[] = {
-//			0, 0, 0,
-//			1, 0, 0,
-//			1, 1, 0,
-//			0, 1, 0
-//	};
-//
-//	float colors[] = {
-//			1, 1, 0,
-//			0, 1, 1,
-//			1, 0, 1,
-//			0, 1, 0
-//	};
-//
-//	float normals[] = {
-//			0, 0, 1,
-//			0, 0, 1,
-//			0, 0, 1,
-//			0, 0, 1
-//	};
-//
-//	unsigned int indices[] = {
-//			0, 1, 2,
-//			0, 2, 3
-//	};
-//
-//	renderer.initShaders("shaders/colorShader.vert", "shaders/colorShader.frag");
-//
-//	renderer.allocBuffers(sizeof(vertices) + sizeof(colors) + sizeof(normals), sizeof(indices));
-//
-//	renderer.subVertexData(0, sizeof(vertices), vertices);
-//	renderer.subVertexData(sizeof(vertices), sizeof(colors), colors);
-//	renderer.subVertexData(sizeof(vertices) + sizeof(colors), sizeof(normals), normals);
-//	renderer.subIndexData(0, sizeof(indices), indices);
-//
-//	renderer.setNumVertices(4, 6);
+	float vertices[] = {
+			0, 0, 0,
+			1, 0, 0,
+			1, 1, 0,
+			0, 1, 0
+	};
+
+	float colors[] = {
+			1, 1, 0,
+			0, 1, 1,
+			1, 0, 1,
+			0, 1, 0
+	};
+
+	float normals[] = {
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1
+	};
+
+	unsigned int indices[] = {
+			0, 1, 2,
+			0, 2, 3
+	};
+
+	renderer.initShaders("shaders/colorShader.vert", "shaders/colorShader.frag");
+
+	renderer.allocBuffers(sizeof(vertices) + sizeof(colors) + sizeof(normals), sizeof(indices));
+
+	renderer.subVertexData(0, sizeof(vertices), vertices);
+	renderer.subVertexData(sizeof(vertices), sizeof(colors), colors);
+	renderer.subVertexData(sizeof(vertices) + sizeof(colors), sizeof(normals), normals);
+	renderer.subIndexData(0, sizeof(indices), indices);
+
+	renderer.setNumVertices(4, 6);
 }
 
 void MainWindow::handleInput() {
 	sf::Event event;
+
+	float moveX = 0, moveY = 0, moveZ = 0;
+	int dx = 0, dy = 0;
 	while(pollEvent(event)){
 		if(event.type == sf::Event::Closed){
 			stop();
@@ -133,6 +141,39 @@ void MainWindow::handleInput() {
 			}
 		}
 	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+		moveZ += 0.1f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+		moveZ -= 0.1f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+		moveX -= 0.1f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+		moveX += 0.1f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+		moveY += 0.1f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+		moveY -= 0.1f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+		dy += 3;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+		dy -= 3;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+		dx -= 3;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+		dx += 3;
+	}
+
+	camera.move(camera.getMoveVector(moveX, moveY, moveZ));
+	camera.rotateWithMove(dx, dy);
 }
 
 void MainWindow::update(time_t dt) {
@@ -141,8 +182,7 @@ void MainWindow::update(time_t dt) {
 void MainWindow::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 viewMatrix = glm::lookAt(glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	renderer.render(&viewMatrix);
+	renderer.render(camera.getViewMatrix());
 //	block.draw();
 
 	display();

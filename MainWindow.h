@@ -12,6 +12,8 @@
 
 #include "Common.h"
 
+#include "FirstPersonCamera.h"
+
 //Temp
 #include "Block.h"
 #include "Renderer.h"
@@ -43,6 +45,7 @@ private:
 
 	//TEMP
 //	Block block;
+	ts::FirstPersonCamera camera;
 	Renderer renderer;
 };
 

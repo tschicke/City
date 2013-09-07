@@ -16,6 +16,8 @@
 
 #include <gl/glew.h>
 
+#include <vector>
+
 Building::Building() {
 	size = 0;
 	buildingID = -1;
@@ -36,9 +38,99 @@ Building::Building(int size, int buildingID, Block* parentBlock) {
 	r = randNum;
 	g = randNum;
 	b = randNum;
+
+//	buildBuilding();
 }
 
 Building::~Building() {
+}
+
+void Building::buildBuilding() {
+	int * lotArray = parentBlock->getLotArray();
+	int lotScale = Block::lotScale;
+
+	std::vector<float> vertexData;
+	std::vector<float> colorData;
+	std::vector<float> normalData;
+	std::vector<unsigned int> indices;
+
+	float buildingData[] = {
+			0, 0, 0,//Back
+			lotScale, 0, 0,
+			lotScale, lotScale, 0,
+			0, lotScale, 0,
+
+			0, 0, lotScale,//Front
+			lotScale, 0, lotScale,
+			lotScale, lotScale, lotScale,
+			0, lotScale, lotScale,
+
+			0, 0, 0,//Left
+			0, 0, lotScale,
+			0, lotScale, lotScale,
+			0, lotScale, 0,
+
+			lotScale, 0, 0,//Right
+			lotScale, 0, lotScale,
+			lotScale, lotScale, lotScale,
+			lotScale, lotScale, 0,
+
+			0, 0, 0,//Bottom
+			lotScale, 0, 0,
+			lotScale, 0, lotScale,
+			0, 0, lotScale,
+
+			0, height, 0,//Top
+			lotScale, height, 0,
+			lotScale, height, lotScale,
+			0, height, lotScale
+	};
+
+	float buildingNormals[] = {
+			0, 0, -1,//Back
+			0, 0, -1,
+			0, 0, -1,
+			0, 0, -1,
+
+			0, 0, 1,//Front
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+
+			-1, 0, 0,//Left
+			-1, 0, 0,
+			-1, 0, 0,
+			-1, 0, 0,
+
+			1, 0, 0,//Right
+			1, 0, 0,
+			1, 0, 0,
+			1, 0, 0,
+
+			0, -1, 0,//Bottom
+			0, -1, 0,
+			0, -1, 0,
+			0, -1, 0,
+
+			0, 1, 0,//Top
+			0, 1, 0,
+			0, 1, 0,
+			0, 1, 0,
+	};
+
+	for(int x = 0; x < Block::blockWidth; ++x){
+		for(int z = 0; z < Block::blockDepth; ++z){
+			if(!lotArray[parentBlock->getLotIndex(x, z)] == buildingID){
+				continue;
+			}
+
+			if(x != 0){
+
+			} else {
+
+			}
+		}
+	}
 }
 
 void Building::draw() {

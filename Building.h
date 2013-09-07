@@ -10,6 +10,8 @@
 
 #include "Common.h"
 
+#include "Renderer.h"
+
 class Block;
 
 class Building {
@@ -21,12 +23,16 @@ public:
 	void draw();
 
 private:
+	void buildBuilding();
+
 	int buildingID;
 
 	int height;
 	int size;
 
 	Block * parentBlock;
+
+	Renderer buildingRenderer;
 
 	//Temp
 	float r, g, b;
