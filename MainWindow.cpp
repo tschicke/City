@@ -19,6 +19,7 @@
 MainWindow::MainWindow() {
 	width = height = 0;
 	running = false;
+	block = NULL;
 }
 
 MainWindow::~MainWindow() {
@@ -34,7 +35,8 @@ void MainWindow::create(int width, int height, const char* title) {
 	initGL();
 	MathHelper::init();
 
-	camera.init(glm::vec3(0, 0, -1));
+	camera.init(glm::vec3(0, 2, 0));
+	block = new Block;
 
 	Renderer::setProjectionMatrix(90, width, height, 100);
 }
@@ -60,6 +62,7 @@ void MainWindow::run() {
 			frames = 0;
 		}
 	}
+	delete block;
 }
 
 void MainWindow::start() {
@@ -183,7 +186,7 @@ void MainWindow::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	renderer.render(camera.getViewMatrix());
-//	block.draw();
+	block->draw(camera.getViewMatrix());
 
 	display();
 }

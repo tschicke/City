@@ -16,7 +16,7 @@
 
 Block::Block() {
 	int seed = time(0);
-	Noise random(seed);
+	Noise random(7866);
 	std::cout << "seed = " << seed << '\n';
 	int numLots = blockWidth * blockDepth;
 	int maxNumBuildings = (blockWidth * 2) + (blockDepth * 2) - 4;
@@ -252,9 +252,9 @@ Block::Block() {
 Block::~Block() {
 }
 
-void Block::draw() {
+void Block::draw(glm::mat4 * viewMatrix) {
 	for (int i = 0; i < numBuildings; ++i) {
-		buildingArray[i].draw();
+		buildingArray[i].draw(viewMatrix);
 	}
 }
 

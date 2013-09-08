@@ -12,6 +12,8 @@
 
 #include "Renderer.h"
 
+#include <glm/glm.hpp>
+
 class Block;
 
 class Building {
@@ -20,7 +22,7 @@ public:
 	Building(int size, int buildingID, Block * parentBlock);
 	virtual ~Building();
 
-	void draw();
+	void draw(glm::mat4 * viewMatrix);
 
 private:
 	void buildBuilding();
@@ -28,7 +30,7 @@ private:
 	int buildingID;
 
 	int height;
-	int size;
+	int buildingSize;
 
 	Block * parentBlock;
 

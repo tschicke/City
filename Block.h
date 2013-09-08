@@ -10,6 +10,8 @@
 
 #include "Building.h"
 
+#include <glm/glm.hpp>
+
 class Block {
 public:
 
@@ -44,13 +46,13 @@ public:
 	Block();
 	virtual ~Block();
 
-	void draw();
+	void draw(glm::mat4 * viewMatrix);
 
 	int * getLotArray();
 	int getNumBuildings();
 
-	static const int blockWidth = 6, blockDepth = 6;
-	static const int lotScale = 100;
+	static const int blockWidth = 3, blockDepth = 3;
+	static const int lotScale = 1;
 
 	friend class Building;
 private:
