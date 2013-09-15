@@ -44,21 +44,25 @@ public:
 		POS_CENTER
 	};
 	Block();
+	Block(int x, int z);
 	virtual ~Block();
 
 	void draw(glm::mat4 * viewMatrix);
 
 	int * getLotArray();
 	int getNumBuildings();
+	int getBlockXCoord();
+	int getBlockZCoord();
 
 	static const int blockWidth = 3, blockDepth = 3;
-	static const int lotScale = 1;
+	static const int lotScale = 40;//Why doesnt this work when lotScale = 1?
 
 	friend class Building;
 private:
 	int numBuildings;
 	Building * buildingArray;
 
+	int blockX, blockZ;
 	int * lotArray;
 
 	int getLotIndex(int x, int y);

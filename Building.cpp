@@ -34,10 +34,10 @@ Building::Building(int size, int buildingID, Block* parentBlock) {
 	this->parentBlock = parentBlock;
 	Noise random(time(0) * ((buildingID + 1) * (buildingID + 97)));
 	float randNum = (random.nextFloat() + 1) / 2.f;
-	height = (randNum * Block::lotScale * size) + (Block::lotScale / 2);
-	r = randNum;
-	g = randNum;
-	b = randNum;
+	height = (randNum * Block::lotScale * size) + (Block::lotScale / 2.f);
+	r = randNum + 0.1;
+	g = randNum + 0.1;
+	b = randNum + 0.1;
 
 	buildBuilding();
 }
@@ -49,9 +49,8 @@ void Building::buildBuilding() {
 	int * lotArray = parentBlock->getLotArray();
 	int lotScale = Block::lotScale;
 
-	int numVerticesPerLot = 4 * 1;//Should be 4 * 6
+	int numVerticesPerLot = 4 * 6;//Should be 4 * 6
 	int numVertices = numVerticesPerLot * buildingSize;
-	int numIndicesPerLot = 6 * 1;//Should be 6 * 6
 
 	float buildingPadding = lotScale / 20.f;
 
@@ -69,7 +68,7 @@ void Building::buildBuilding() {
 				continue;
 			}
 
-			int x1 = x * lotScale, x2 = (x + 1) * lotScale, z1 = z * lotScale, z2 = (z + 1) * lotScale;
+			float x1 = x * lotScale + (parentBlock->getBlockXCoord()), x2 = (x + 1) * lotScale + parentBlock->getBlockXCoord(), z1 = z * lotScale + parentBlock->getBlockZCoord(), z2 = (z + 1) * lotScale + parentBlock->getBlockZCoord();
 
 			if (x != 0) {
 				if (lotArray[parentBlock->getLotIndex(x - 1, z)] != buildingID) {
@@ -168,37 +167,152 @@ void Building::buildBuilding() {
 					glm::vec3(x2, 0, z1),
 					glm::vec3(x2, 0, z2),
 					glm::vec3(x1, 0, z2),
+
+					glm::vec3(x1, height, z1),//Top
+					glm::vec3(x2, height, z1),
+					glm::vec3(x2, height, z2),
+					glm::vec3(x1, height, z2),
+
+					glm::vec3(x1, 0, z1),//Left
+					glm::vec3(x1, 0, z2),
+					glm::vec3(x1, height, z2),
+					glm::vec3(x1, height, z1),
+
+					glm::vec3(x2, 0, z1),//Right
+					glm::vec3(x2, 0, z2),
+					glm::vec3(x2, height, z2),
+					glm::vec3(x2, height, z1),
+
+					glm::vec3(x1, 0, z1),//Back
+					glm::vec3(x2, 0, z1),
+					glm::vec3(x2, height, z1),
+					glm::vec3(x1, height, z1),
+
+					glm::vec3(x1, 0, z2),//Front
+					glm::vec3(x2, 0, z2),
+					glm::vec3(x2, height, z2),
+					glm::vec3(x1, height, z2),
+			};
+
+			glm::vec3 tempNormalArray[] = {
+					glm::vec3(0, 1, 0),//Bottom
+					glm::vec3(0, 1, 0),
+					glm::vec3(0, 1, 0),
+					glm::vec3(0, 1, 0),
+
+					glm::vec3(0, -1, 0),//Top
+					glm::vec3(0, -1, 0),
+					glm::vec3(0, -1, 0),
+					glm::vec3(0, -1, 0),
+
+					glm::vec3(1, 0, 0),//Left
+					glm::vec3(1, 0, 0),
+					glm::vec3(1, 0, 0),
+					glm::vec3(1, 0, 0),
+
+					glm::vec3(-1, 0, 0),//Right
+					glm::vec3(-1, 0, 0),
+					glm::vec3(-1, 0, 0),
+					glm::vec3(-1, 0, 0),
+
+					glm::vec3(0, 0, -1),//Back
+					glm::vec3(0, 0, -1),
+					glm::vec3(0, 0, -1),
+					glm::vec3(0, 0, -1),
+
+					glm::vec3(0, 0, 1),//Front
+					glm::vec3(0, 0, 1),
+					glm::vec3(0, 0, 1),
+					glm::vec3(0, 0, 1),
 			};
 
 			unsigned int tempIndices[] = {
-					0, 1, 2,
+					0, 1, 2,//Bottom
 					0, 2, 3,
+
+					4, 5, 6,//Top
+					4, 6, 7,
+
+					8, 9, 10,//Left
+					8, 10, 11,
+
+					12, 13, 14,//Right
+					12, 14, 15,
+
+					16, 17, 18,//Back
+					16, 18, 19,
+
+					20, 21, 22,//Front
+					20, 22, 23,
 			};
 
 			int dataIndex = sizeCounter * numVerticesPerLot;
 			for(int i = 0; i < numVerticesPerLot; ++i){
 				vertexData[dataIndex + i] = tempVertexArray[i];
 				colorData[dataIndex + i] = glm::vec3(r, g, b);
-				normals[dataIndex + i] = glm::vec3(0, 1, 0);//Temp
+				normals[dataIndex + i] = tempNormalArray[i];//Temp
 			}
 
-			for(int i = 0; i < numIndicesPerLot; ++i){
+			//Bottom and Top
+			for (int i = 0; i < 12; ++i) {
 				indices.push_back(tempIndices[i] + dataIndex);
 			}
 
+			//Left
+			if (x != 0) {
+				if (lotArray[parentBlock->getLotIndex(x - 1, z)] != buildingID) {
+					for (int i = 12; i < 18; ++i) {
+						indices.push_back(tempIndices[i] + dataIndex);
+					}
+				}
+			} else {
+				for (int i = 12; i < 18; ++i) {
+					indices.push_back(tempIndices[i] + dataIndex);
+				}
+			}
 
+			//Right
+			if (x != Block::blockWidth - 1) {
+				if (lotArray[parentBlock->getLotIndex(x + 1, z)] != buildingID) {
+					for (int i = 18; i < 24; ++i) {
+						indices.push_back(tempIndices[i] + dataIndex);
+					}
+				}
+			} else {
+				for (int i = 18; i < 24; ++i) {
+					indices.push_back(tempIndices[i] + dataIndex);
+				}
+			}
+
+			//Back
+			if (z != 0) {
+				if (lotArray[parentBlock->getLotIndex(x, z - 1)] != buildingID) {
+					for (int i = 24; i < 30; ++i) {
+						indices.push_back(tempIndices[i] + dataIndex);
+					}
+				}
+			} else {
+				for (int i = 24; i < 30; ++i) {
+					indices.push_back(tempIndices[i] + dataIndex);
+				}
+			}
+
+			//Front
+			if (z != Block::blockDepth - 1) {
+				if (lotArray[parentBlock->getLotIndex(x, z + 1)] != buildingID) {
+					for (int i = 30; i < 36; ++i) {
+						indices.push_back(tempIndices[i] + dataIndex);
+					}
+				}
+			} else {
+				for (int i = 30; i < 36; ++i) {
+					indices.push_back(tempIndices[i] + dataIndex);
+				}
+			}
 
 			++sizeCounter;
 		}
 	}
-
-//	for(int i = 0; i < numVertices; ++i){
-//		std::cout << vertexData[i].r << ' ' << vertexData[i].g << ' ' << vertexData[i].b << '\n';
-//	}
-
-//	for(unsigned int i = 0; i < indices.size(); ++i){
-//		std::cout << indices[i] << '\n';
-//	}
 
 	buildingRenderer.initShaders("shaders/colorShader.vert", "shaders/colorShader.frag");
 
@@ -207,8 +321,6 @@ void Building::buildBuilding() {
 	buildingRenderer.subVertexData(numVertices * 3 * sizeof(float), numVertices * 3 * sizeof(float), (float *)colorData);
 	buildingRenderer.subVertexData(numVertices * 3 * sizeof(float) * 2, numVertices * 3 * sizeof(float), (float *)normals);
 	buildingRenderer.subIndexData(0, indices.size() * sizeof(unsigned int), indices.data());
-
-	std::cout << "numVerts " << indices.size() << '\n';
 
 	buildingRenderer.setNumVertices(numVertices, indices.size());
 }

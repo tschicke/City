@@ -14,9 +14,18 @@
 #include "Noise.h"
 #include "MathHelper.h"
 
-Block::Block() {
-	int seed = time(0);
-	Noise random(7866);
+Block::Block(){
+	blockX = blockZ = 0;
+	buildingArray = NULL;
+	numBuildings = 0;
+	lotArray = NULL;
+}
+
+Block::Block(int x, int z) {
+	blockX = x;
+	blockZ = z;
+	int seed = time(0) + (x * 65537) + (z * 4730861);
+	Noise r(seed);
 	std::cout << "seed = " << seed << '\n';
 	int numLots = blockWidth * blockDepth;
 	int maxNumBuildings = (blockWidth * 2) + (blockDepth * 2) - 4;
@@ -29,7 +38,7 @@ Block::Block() {
 	int lotIndex = 0;
 	while (lotsTaken < numLots) {
 		numBuildings++;
-		float buildingSize = (random.nextFloat() + 1) / 2.f;
+		float buildingSize = (r.nextFloat() + 1) / 2.f;
 		buildingSize *= buildingSize * buildingSize * buildingSize;
 		buildingSize = ceil(buildingSize * numLots);
 
@@ -55,35 +64,34 @@ Block::Block() {
 		int buildingSize = buildingSizes[building];
 		//Start position
 //		int startOffset = (random.nextInt() % (maxNumBuildings - 1)) + 1;
-		int startX = 0, startZ = 0;
+		int startX = (blockWidth - 1) / 2, startZ = 0;
 		int xDir = 1, zDir = 0;
-//		int i = 0;
-		if (building != 0) {
-			do {
-				if(startX + xDir > blockWidth - 1){
-					xDir = 0;
-					zDir = 1;
-				}
-				if(startZ + zDir > blockDepth - 1){
-					xDir = -1;
-					zDir = 0;
-				}
-				if(startX + xDir < 0){
-					xDir = 0;
-					zDir = -1;
-				}
-				if(startZ + zDir < 0){
-					xDir = 1;
-					zDir = 0;
-				}
+		int i = 0;
+		while (lotArray[getLotIndex(startX, startZ)] != -1) {
+			if (startX + xDir > blockWidth - 1) {
+				xDir = 0;
+				zDir = 1;
+			}
+			if (startZ + zDir > blockDepth - 1) {
+				xDir = -1;
+				zDir = 0;
+			}
+			if (startX + xDir < 0) {
+				xDir = 0;
+				zDir = -1;
+			}
+			if (startZ + zDir < 0) {
+				xDir = 1;
+				zDir = 0;
+			}
 
-				startX += xDir;
-				startZ += zDir;
+			startX += xDir;
+			startZ += zDir;
 
-//				if(lotArray[getLotIndex(startX, startZ)] == -1){
-//					++i;
-//				}
-			} while(lotArray[getLotIndex(startX, startZ)] != -1);
+			i++;
+			if(i > 100){
+				exit(0);
+			}
 		}
 		lotArray[getLotIndex(startX, startZ)] = building;
 
@@ -201,7 +209,7 @@ Block::Block() {
 					}
 
 					if(lotPriority == priority){
-						if(random.nextFloat() < 0.5f){
+						if(r.nextFloat() < 0.5f){
 							lotX = x;
 							lotZ = z;
 						}
@@ -264,6 +272,18 @@ int* Block::getLotArray() {
 
 int Block::getNumBuildings() {
 	return numBuildings;
+}
+
+int Block::getBlockXCoord() {
+	//Temp StreetWidth
+	float streetWidth = lotScale * ((blockWidth + blockDepth) / 2.f) * (1.f / 3);
+	return (blockX * lotScale * blockWidth) + (blockX * streetWidth);
+}
+
+int Block::getBlockZCoord() {
+	//Temp StreetWidth
+	float streetWidth = lotScale * ((blockWidth + blockDepth) / 2.f) * (1.f / 3);
+	return (blockZ * lotScale * blockDepth) + (blockZ * streetWidth);
 }
 
 int Block::getLotIndex(int x, int y) {

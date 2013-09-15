@@ -29,7 +29,7 @@ private:
 
 	int buildingID;
 
-	int height;
+	float height;
 	int buildingSize;
 
 	Block * parentBlock;

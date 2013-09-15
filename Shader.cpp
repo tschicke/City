@@ -93,7 +93,7 @@ ShaderProgram::ShaderProgram() {
 }
 
 ShaderProgram::~ShaderProgram() {
-	deleteProgram();
+//	deleteProgram();
 }
 
 void ShaderProgram::createProgram() {

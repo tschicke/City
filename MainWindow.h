@@ -44,7 +44,7 @@ private:
 	void cleanup();
 
 	//TEMP
-	Block * block;
+	Block ** blocks;
 	ts::FirstPersonCamera camera;
 	Renderer renderer;
 };

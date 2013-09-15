@@ -19,7 +19,7 @@
 MainWindow::MainWindow() {
 	width = height = 0;
 	running = false;
-	block = NULL;
+	blocks = NULL;
 }
 
 MainWindow::~MainWindow() {
@@ -35,10 +35,15 @@ void MainWindow::create(int width, int height, const char* title) {
 	initGL();
 	MathHelper::init();
 
-	camera.init(glm::vec3(0, 2, 0));
-	block = new Block;
+	camera.init(glm::vec3(0, 6, 0));
+	blocks = new Block*[36];
+	for(int x = -3; x < 3; ++x){
+		for(int z = -3; z < 3; ++z){
+			blocks[z + x * 6] = new Block(x, z);
+		}
+	}
 
-	Renderer::setProjectionMatrix(90, width, height, 100);
+	Renderer::setProjectionMatrix(90, width, height, 400);
 }
 
 void MainWindow::run() {
@@ -62,7 +67,11 @@ void MainWindow::run() {
 			frames = 0;
 		}
 	}
-	delete block;
+
+	for(int i = 0; i < 4; ++i){
+		delete blocks[i];
+	}
+	delete[] blocks;
 }
 
 void MainWindow::start() {
@@ -90,47 +99,15 @@ void MainWindow::initGL() {
 
 	glEnable(GL_DEPTH_TEST);
 //	glEnable(GL_CULL_FACE);
-
-	float vertices[] = {
-			0, 0, 0,
-			1, 0, 0,
-			1, 1, 0,
-			0, 1, 0
-	};
-
-	float colors[] = {
-			1, 1, 0,
-			0, 1, 1,
-			1, 0, 1,
-			0, 1, 0
-	};
-
-	float normals[] = {
-			0, 0, 1,
-			0, 0, 1,
-			0, 0, 1,
-			0, 0, 1
-	};
-
-	unsigned int indices[] = {
-			0, 1, 2,
-			0, 2, 3
-	};
-
-	renderer.initShaders("shaders/colorShader.vert", "shaders/colorShader.frag");
-
-	renderer.allocBuffers(sizeof(vertices) + sizeof(colors) + sizeof(normals), sizeof(indices));
-
-	renderer.subVertexData(0, sizeof(vertices), vertices);
-	renderer.subVertexData(sizeof(vertices), sizeof(colors), colors);
-	renderer.subVertexData(sizeof(vertices) + sizeof(colors), sizeof(normals), normals);
-	renderer.subIndexData(0, sizeof(indices), indices);
-
-	renderer.setNumVertices(4, 6);
 }
 
 void MainWindow::handleInput() {
 	sf::Event event;
+
+	static sf::Vector2i lastMousePos = sf::Mouse::getPosition();
+	sf::Vector2i mousePos = sf::Mouse::getPosition();
+	sf::Vector2i mouseMove = lastMousePos - mousePos;
+	lastMousePos = mousePos;
 
 	float moveX = 0, moveY = 0, moveZ = 0;
 	int dx = 0, dy = 0;
@@ -157,10 +134,10 @@ void MainWindow::handleInput() {
 		moveX += 0.1f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-		moveY += 0.1f;
+		moveY += 0.4f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-		moveY -= 0.1f;
+		moveY -= 0.4f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 		dy += 3;
@@ -175,7 +152,12 @@ void MainWindow::handleInput() {
 		dx += 3;
 	}
 
-	camera.move(camera.getMoveVector(moveX, moveY, moveZ));
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+		dx -= mouseMove.x;
+		dy += mouseMove.y;
+	}
+
+	camera.move(camera.getMoveVector(moveX, moveY, moveZ) * 3.f);
 	camera.rotateWithMove(dx, dy);
 }
 
@@ -185,8 +167,11 @@ void MainWindow::update(time_t dt) {
 void MainWindow::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	renderer.render(camera.getViewMatrix());
-	block->draw(camera.getViewMatrix());
+//	for (int x = 0; x < 6; ++x) {
+//		for (int z = 0; z < 6; ++z) {
+//			blocks[z + x * 6]->draw(camera.getViewMatrix());
+//		}
+//	}
 
 	display();
 }

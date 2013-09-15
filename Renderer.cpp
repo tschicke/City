@@ -119,6 +119,7 @@ void Renderer::initShaders(const char* vertexShaderPath, const char* fragmentSha
 	if(shadersInitialized){
 		return;
 	}
+
 	Shader vertexShader;
 	vertexShader.loadShader(vertexShaderPath, GL_VERTEX_SHADER);
 
