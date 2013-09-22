@@ -24,6 +24,33 @@ Block::Block(){
 Block::Block(int x, int z) {
 	blockX = x;
 	blockZ = z;
+
+	streetRenderer.initShaders("shaders/colorShader.vert", "shaders/colorShader.frag");
+	float floor[] = {
+			getBlockXCoord() - (streetWidth / 2), 0, getBlockZCoord() - (streetWidth / 2),
+			getBlockXCoord() + (blockWidth * lotScale) + (streetWidth / 2), 0, getBlockZCoord() - (streetWidth / 2),
+			getBlockXCoord() + (blockWidth * lotScale) + (streetWidth / 2), 0, getBlockZCoord() + (blockWidth * lotScale) + (streetWidth / 2),
+			getBlockXCoord() - (streetWidth / 2), 0, getBlockZCoord() + (blockWidth * lotScale) + (streetWidth / 2),
+
+			0.35f, 0.35f, 0.35f,
+			0.35f, 0.35f, 0.35f,
+			0.35f, 0.35f, 0.35f,
+			0.35f, 0.35f, 0.35f,
+
+			0, 1, 0,
+			0, 1, 0,
+			0, 1, 0,
+			0, 1, 0,
+	};
+	unsigned int floorIndices[] = {
+			0, 1, 2,
+			0, 2, 3
+	};
+	streetRenderer.allocBuffers(sizeof(floor), sizeof(floorIndices));
+	streetRenderer.subVertexData(0, sizeof(floor), floor);
+	streetRenderer.subIndexData(0, sizeof(floorIndices), floorIndices);
+	streetRenderer.setNumVertices(4, 6);
+
 	int seed = time(0) + (x * 65537) + (z * 4730861);
 	Noise r(seed);
 	std::cout << "seed = " << seed << '\n';
@@ -64,9 +91,25 @@ Block::Block(int x, int z) {
 		int buildingSize = buildingSizes[building];
 		//Start position
 //		int startOffset = (random.nextInt() % (maxNumBuildings - 1)) + 1;
-		int startX = (blockWidth - 1) / 2, startZ = 0;
+		int startX = 0, startZ = 0;
+		float rand1 = r.nextFloat();
+		float rand2 = r.nextFloat();
+		if(rand1 > 0.5f){
+			startX = (blockWidth - 1) / 2;
+			if(rand2 > 0.5f){
+				startZ = 0;
+			} else {
+				startZ = blockDepth;
+			}
+		} else {
+			startZ = (blockDepth - 1) / 2;
+			if(rand2 > 0.5f){
+				startX = 0;
+			} else {
+				startZ = (blockWidth - 1) / 2;
+			}
+		}
 		int xDir = 1, zDir = 0;
-		int i = 0;
 		while (lotArray[getLotIndex(startX, startZ)] != -1) {
 			if (startX + xDir > blockWidth - 1) {
 				xDir = 0;
@@ -87,11 +130,6 @@ Block::Block(int x, int z) {
 
 			startX += xDir;
 			startZ += zDir;
-
-			i++;
-			if(i > 100){
-				exit(0);
-			}
 		}
 		lotArray[getLotIndex(startX, startZ)] = building;
 
@@ -264,6 +302,7 @@ void Block::draw(glm::mat4 * viewMatrix) {
 	for (int i = 0; i < numBuildings; ++i) {
 		buildingArray[i].draw(viewMatrix);
 	}
+	streetRenderer.render(viewMatrix);
 }
 
 int* Block::getLotArray() {
@@ -275,8 +314,6 @@ int Block::getNumBuildings() {
 }
 
 int Block::getBlockXCoord() {
-	//Temp StreetWidth
-	float streetWidth = lotScale * ((blockWidth + blockDepth) / 2.f) * (1.f / 3);
 	return (blockX * lotScale * blockWidth) + (blockX * streetWidth);
 }
 

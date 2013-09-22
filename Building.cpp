@@ -34,7 +34,7 @@ Building::Building(int size, int buildingID, Block* parentBlock) {
 	this->parentBlock = parentBlock;
 	Noise random(time(0) * ((buildingID + 1) * (buildingID + 97)));
 	float randNum = (random.nextFloat() + 1) / 2.f;
-	height = (randNum * Block::lotScale * size) + (Block::lotScale / 2.f);
+	height = (randNum * Block::lotScale * size) + (Block::lotScale);
 	r = randNum + 0.1;
 	g = randNum + 0.1;
 	b = randNum + 0.1;

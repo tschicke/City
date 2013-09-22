@@ -37,13 +37,13 @@ void MainWindow::create(int width, int height, const char* title) {
 
 	camera.init(glm::vec3(0, 6, 0));
 	blocks = new Block*[36];
-	for(int x = -3; x < 3; ++x){
-		for(int z = -3; z < 3; ++z){
-			blocks[z + x * 6] = new Block(x, z);
+	for(int x = 0; x < 6; ++x){
+		for(int z = 0; z < 6; ++z){
+			blocks[z + x * 6] = new Block(x - 3, z - 3);
 		}
 	}
 
-	Renderer::setProjectionMatrix(90, width, height, 400);
+	Renderer::setProjectionMatrix(90, width, height, 1000);
 }
 
 void MainWindow::run() {
@@ -68,7 +68,7 @@ void MainWindow::run() {
 		}
 	}
 
-	for(int i = 0; i < 4; ++i){
+	for(int i = 0; i < 36; ++i){
 		delete blocks[i];
 	}
 	delete[] blocks;
@@ -114,24 +114,26 @@ void MainWindow::handleInput() {
 	while(pollEvent(event)){
 		if(event.type == sf::Event::Closed){
 			stop();
+			return;
 		}
 		if(event.type == sf::Event::KeyPressed){
 			if(event.key.code == sf::Keyboard::Escape){
 				stop();
+				return;
 			}
 		}
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-		moveZ += 0.1f;
+		moveZ += 0.4f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-		moveZ -= 0.1f;
+		moveZ -= 0.4f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		moveX -= 0.1f;
+		moveX -= 0.4f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		moveX += 0.1f;
+		moveX += 0.4f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
 		moveY += 0.4f;
@@ -167,11 +169,11 @@ void MainWindow::update(time_t dt) {
 void MainWindow::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//	for (int x = 0; x < 6; ++x) {
-//		for (int z = 0; z < 6; ++z) {
-//			blocks[z + x * 6]->draw(camera.getViewMatrix());
-//		}
-//	}
+	for (int x = 0; x < 6; ++x) {
+		for (int z = 0; z < 6; ++z) {
+			blocks[z + x * 6]->draw(camera.getViewMatrix());
+		}
+	}
 
 	display();
 }

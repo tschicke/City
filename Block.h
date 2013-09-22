@@ -8,6 +8,7 @@
 #ifndef BLOCK_H_
 #define BLOCK_H_
 
+#include "Renderer.h"
 #include "Building.h"
 
 #include <glm/glm.hpp>
@@ -56,9 +57,12 @@ public:
 
 	static const int blockWidth = 3, blockDepth = 3;
 	static const int lotScale = 40;//Why doesnt this work when lotScale = 1?
+	static const float streetWidth = lotScale * ((blockWidth + blockDepth) / 2.f) * (1.f / 3);
 
 	friend class Building;
 private:
+	Renderer streetRenderer;
+
 	int numBuildings;
 	Building * buildingArray;
 
